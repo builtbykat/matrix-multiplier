@@ -63,4 +63,21 @@ class MatrixController extends Controller
         }
         return $product;
     }
+
+    /**
+     * @param int $num
+     * @return string
+     * thanks @StackOverflow, for a much cleaner version than where mine was going
+     * https://stackoverflow.com/questions/3302857/algorithm-to-get-the-excel-like-column-name-of-a-number
+     */
+    private function getLetterFromNumber(int $num) {
+        $numeric = ($num - 1) % 26;
+        $letter = chr(65 + $numeric);
+        $num2 = intval(($num - 1) / 26);
+        if ($num2 > 0) {
+            return $this->getLetterFromNumber($num2) . $letter;
+        } else {
+            return $letter;
+        }
+    }
 }

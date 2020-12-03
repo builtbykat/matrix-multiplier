@@ -116,4 +116,28 @@ class MatrixTest extends TestCase
         $multiplyMatrices->setAccessible(true);
         $this->assertEquals($expected, $multiplyMatrices->invoke($c, $m1, $m2, $stub));
     }
+
+    public function providerNumber()
+    {
+        return [
+            [1, 'A'],
+            [26, 'Z'],
+            [27, 'AA'],
+            [28, 'AB'],
+            [14558, 'UMX'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerNumber
+     * @param int $n
+     * @param string $expected
+     */
+    public function testGetLetterFromNumber(int $n, string $expected)
+    {
+        $c = new App\Http\Controllers\MatrixController();
+        $getLetterFromNumber = new ReflectionMethod('App\Http\Controllers\MatrixController', 'getLetterFromNumber');
+        $getLetterFromNumber->setAccessible(true);
+        $this->assertEquals($expected, $getLetterFromNumber->invoke($c, $n));
+    }
 }
