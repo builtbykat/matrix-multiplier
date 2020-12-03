@@ -19,7 +19,7 @@ class MatrixController extends Controller
         $m1 = $matrices[0];
         $m2 = $matrices[1];
         if ($productPlaceholder = $this->validateMatrices($m1, $m2)) {
-            return [];
+            return $this->multiplyMatrices($m1, $m2, $productPlaceholder);
         }
 
         return [];
@@ -44,5 +44,23 @@ class MatrixController extends Controller
             }
         }
         return $productPlaceholder;
+    }
+
+    /**
+     * @param array $m1
+     * @param array $m2
+     * @param array $product
+     * @return array
+     */
+    private function multiplyMatrices(array $m1, array $m2, array $product) {
+        for ($i = 0; $i < count($product); $i++) {
+            for ($j = 0; $j < count($product); $j++) {
+                for ($k = 0; $k < count($m2); $k++) {
+                    if (isset($product[$i][$j]))
+                        $product[$i][$j] += $m1[$i][$k] * $m2[$k][$j];
+                }
+            }
+        }
+        return $product;
     }
 }

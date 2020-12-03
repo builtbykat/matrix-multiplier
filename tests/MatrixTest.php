@@ -59,6 +59,10 @@ class MatrixTest extends TestCase
                 [
                     [22,28],
                     [49,64],
+                ],
+                [
+                    [0,0],
+                    [0,0],
                 ]
             ],
             [//1
@@ -75,6 +79,10 @@ class MatrixTest extends TestCase
                 [
                     [50,60],
                     [114,140],
+                ],
+                [
+                    [0,0],
+                    [0,0],
                 ]
             ],
         ];
@@ -86,11 +94,26 @@ class MatrixTest extends TestCase
      * @param array $m2
      * @param array $expected product size
      */
-    public function testWhenMatrixColRowEqual($m1, $m2, $expected)
+    public function testWhenMatrixColRowEqual(array $m1, array $m2, array $expected)
     {
         $c = new App\Http\Controllers\MatrixController();
         $validateMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateMatrices');
         $validateMatrices->setAccessible(true);
         $this->assertSameSize($expected, $validateMatrices->invoke($c, $m1, $m2));
+    }
+
+    /**
+     * @dataProvider providerGoodMatrices
+     * @param array $m1
+     * @param array $m2
+     * @param array $expected product matrix
+     * @param array $stub product matrix set to zeros
+     */
+    public function testMultiplyMatrices(array $m1, array $m2, array $expected, array $stub)
+    {
+        $c = new App\Http\Controllers\MatrixController();
+        $multiplyMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'multiplyMatrices');
+        $multiplyMatrices->setAccessible(true);
+        $this->assertEquals($expected, $multiplyMatrices->invoke($c, $m1, $m2, $stub));
     }
 }
