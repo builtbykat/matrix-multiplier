@@ -13,8 +13,8 @@ class MatrixController extends Controller
      * @throws Exception
      */
     public function multiply(Request $request) {
-        $request = $request->all();
-        $matrices = json_decode($request['matrices']);
+        $request = $request->json()->get('matrices');
+        $matrices = json_decode($request);
 
         $m1 = $matrices[0];
         $m2 = $matrices[1];
