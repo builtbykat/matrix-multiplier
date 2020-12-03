@@ -80,4 +80,17 @@ class MatrixController extends Controller
             return $letter;
         }
     }
+
+    /**
+     * @param array $product
+     * @return array
+     */
+    private function translateProductToLetters(array $product) {
+        for ($i = 0; $i < count($product); $i++) {
+            for ($j = 0; $j < count($product); $j++) {
+                $product[$i][$j] = $this->getLetterFromNumber($product[$i][$j]);
+            }
+        }
+        return $product;
+    }
 }

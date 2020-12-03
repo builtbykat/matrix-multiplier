@@ -140,4 +140,43 @@ class MatrixTest extends TestCase
         $getLetterFromNumber->setAccessible(true);
         $this->assertEquals($expected, $getLetterFromNumber->invoke($c, $n));
     }
+
+    public function providerProductMatrix()
+    {
+        return [
+            [
+                [
+                    [1,2],
+                    [26,27],
+                ],
+                [
+                    ['A','B'],
+                    ['Z','AA'],
+                ]
+            ],
+            [
+                [
+                    [11,19],
+                    [28,14558],
+                ],
+                [
+                    ['K','S'],
+                    ['AB','UMX'],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider providerProductMatrix
+     * @param array $numProduct
+     * @param array $expected
+     */
+    public function testTranslateProductToLetters(array $numProduct, array $expected)
+    {
+        $c = new App\Http\Controllers\MatrixController();
+        $translateProductToLetters = new ReflectionMethod('App\Http\Controllers\MatrixController', 'translateProductToLetters');
+        $translateProductToLetters->setAccessible(true);
+        $this->assertEquals($expected, $translateProductToLetters->invoke($c, $numProduct));
+    }
 }
