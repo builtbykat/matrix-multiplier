@@ -9,20 +9,21 @@ class MatrixController extends Controller
 {
     /**
      * @param Request $request
-     * @return array
+     * @return array|void
      * @throws Exception
      */
     public function multiply(Request $request) {
-        $request = $request->json()->get('matrices');
-        $matrices = json_decode($request);
+        $content = json_decode($request->getContent(), true);
+        $matrices = json_decode($content['matrices']);
 
         $m1 = $matrices[0];
         $m2 = $matrices[1];
         if ($productPlaceholder = $this->validateMatrices($m1, $m2)) {
-            return $this->multiplyMatrices($m1, $m2, $productPlaceholder);
+            $numProducts = $this->multiplyMatrices($m1, $m2, $productPlaceholder);
+            return $this->translateProductToLetters($numProducts);
         }
 
-        return [];
+        return;
     }
 
     /**
