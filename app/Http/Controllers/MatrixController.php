@@ -1,27 +1,38 @@
 <?php
 
+/**
+ * This controller handles our sole endpoint
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Exception;
 
+/**
+ * Class MatrixController
+ *
+ * @package App\Http\Controllers
+ */
 class MatrixController extends Controller
 {
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return object
-     * @throws Exception
+     * @throws \Exception
      */
-    public function multiply(Request $request) {
+    public function multiply(Request $request)
+    {
         $content = json_decode($request->getContent(), true);
-        if (!$this->validateContent($content['matrices']))
-            throw new Exception('Matrices must only contain integers.', 422);
+        if (!$this->validateContent($content['matrices'])) {
+            throw new \Exception('Matrices must only contain integers.', 422);
+        }
 
         $matrices = json_decode($content['matrices']);
         $m1 = $matrices[0];
         $m2 = $matrices[1];
-        if (!$this->validateMatrices($m1, $m2))
-            throw new Exception('Matrix cannot be multiplied.  Matrix is not the same size.', 422);
+        if (!$this->validateMatrices($m1, $m2)) {
+            throw new \Exception('Matrix cannot be multiplied.  Matrix is not the same size.', 422);
+        }
 
         $productPlaceholder = $this->createProductPlaceholder($m1, $m2);
 
@@ -32,39 +43,45 @@ class MatrixController extends Controller
     }
 
     /**
-     * @param string $content
+     * @param  string $content
      * @return bool
      * @throws Exception
      */
-    public function validateContent(string $content) {
-        if (preg_match('/[a-z=!#&*|<>]/i', $content))
+    public function validateContent(string $content)
+    {
+        if (preg_match('/[a-z=!#&*|<>]/i', $content)) {
             return false;
+        }
         return true;
     }
 
     /**
-     * @param array $m1
-     * @param array $m2
+     * @param  array $m1
+     * @param  array $m2
      * @return bool
      * @throws Exception
      */
-    private function validateMatrices(array $m1, array $m2) {
-        if (count($m1[0]) !== count($m2))
+    private function validateMatrices(array $m1, array $m2)
+    {
+        if (count($m1[0]) !== count($m2)) {
             return false;
+        }
         return true;
     }
 
     /**
      * Set up matrix to populate later, helps prevent undefined index issues
-     * @param array $m1
-     * @param array $m2
+     *
+     * @param  array $m1
+     * @param  array $m2
      * @return array
      */
-    private function createProductPlaceholder(array $m1, array $m2) {
+    private function createProductPlaceholder(array $m1, array $m2)
+    {
         $productSize = count($m1) * count($m2[0]);
         $productPlaceholder = [];
-        for ($i = 0; $i < $productSize/2; $i++) {
-            for ($j = 0; $j < $productSize/2; $j++) {
+        for ($i = 0; $i < $productSize / 2; $i++) {
+            for ($j = 0; $j < $productSize / 2; $j++) {
                 $productPlaceholder[$i][$j] = 0;
             }
         }
@@ -72,17 +89,19 @@ class MatrixController extends Controller
     }
 
     /**
-     * @param array $m1
-     * @param array $m2
-     * @param array $product
+     * @param  array $m1
+     * @param  array $m2
+     * @param  array $product
      * @return array
      */
-    private function multiplyMatrices(array $m1, array $m2, array $product) {
+    private function multiplyMatrices(array $m1, array $m2, array $product)
+    {
         for ($i = 0; $i < count($product); $i++) {
             for ($j = 0; $j < count($product); $j++) {
                 for ($k = 0; $k < count($m2); $k++) {
-                    if (isset($product[$i][$j]))
+                    if (isset($product[$i][$j])) {
                         $product[$i][$j] += $m1[$i][$k] * $m2[$k][$j];
+                    }
                 }
             }
         }
@@ -90,12 +109,13 @@ class MatrixController extends Controller
     }
 
     /**
-     * @param int $num
+     * @param  int $num
      * @return string
      * thanks @StackOverflow, for a much cleaner version than where mine was going
      * https://stackoverflow.com/questions/3302857/algorithm-to-get-the-excel-like-column-name-of-a-number
      */
-    private function getLetterFromNumber(int $num) {
+    private function getLetterFromNumber(int $num)
+    {
         $numeric = ($num - 1) % 26;
         $letter = chr(65 + $numeric);
         $num2 = intval(($num - 1) / 26);
@@ -107,10 +127,11 @@ class MatrixController extends Controller
     }
 
     /**
-     * @param array $product
+     * @param  array $product
      * @return array
      */
-    private function translateProductToLetters(array $product) {
+    private function translateProductToLetters(array $product)
+    {
         for ($i = 0; $i < count($product); $i++) {
             for ($j = 0; $j < count($product); $j++) {
                 $product[$i][$j] = $this->getLetterFromNumber($product[$i][$j]);

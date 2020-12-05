@@ -16,7 +16,7 @@ class MatrixTest extends TestCase
      */
     protected string $mcName;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->mc = new App\Http\Controllers\MatrixController();
         $this->mcName = App\Http\Controllers\MatrixController::class;
@@ -41,11 +41,11 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::validateContent
+     * @covers       \App\Http\Controllers\MatrixController::validateContent
      * @dataProvider providerContent
-     * @param string $content
-     * @param bool $expected
-     * @throws ReflectionException
+     * @param        string $content
+     * @param        bool   $expected
+     * @throws       ReflectionException
      */
     public function testValidateContent(string $content, bool $expected)
     {
@@ -96,12 +96,12 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::validateMatrices()
+     * @covers       \App\Http\Controllers\MatrixController::validateMatrices()
      * @dataProvider providerMatrices
-     * @param array $m1
-     * @param array $m2
-     * @param bool $expected
-     * @throws ReflectionException
+     * @param        array $m1
+     * @param        array $m2
+     * @param        bool  $expected
+     * @throws       ReflectionException
      */
     public function testValidateMatrices(array $m1, array $m2, bool $expected)
     {
@@ -156,12 +156,12 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::createProductPlaceholder()
+     * @covers       \App\Http\Controllers\MatrixController::createProductPlaceholder()
      * @dataProvider providerGoodMatrices
-     * @param array $m1
-     * @param array $m2
-     * @param array $expected product size
-     * @throws ReflectionException
+     * @param        array $m1
+     * @param        array $m2
+     * @param        array $expected product size
+     * @throws       ReflectionException
      */
     public function testCreateProductPlaceholder(array $m1, array $m2, array $expected)
     {
@@ -171,13 +171,13 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::multiplyMatrices()
+     * @covers       \App\Http\Controllers\MatrixController::multiplyMatrices()
      * @dataProvider providerGoodMatrices
-     * @param array $m1
-     * @param array $m2
-     * @param array $expected product matrix
-     * @param array $stub product matrix set to zeros
-     * @throws ReflectionException
+     * @param        array $m1
+     * @param        array $m2
+     * @param        array $expected product matrix
+     * @param        array $stub     product matrix set to zeros
+     * @throws       ReflectionException
      */
     public function testMultiplyMatrices(array $m1, array $m2, array $expected, array $stub)
     {
@@ -198,11 +198,11 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::getLetterFromNumber()
+     * @covers       \App\Http\Controllers\MatrixController::getLetterFromNumber()
      * @dataProvider providerNumber
-     * @param int $n
-     * @param string $expected
-     * @throws ReflectionException
+     * @param        int    $n
+     * @param        string $expected
+     * @throws       ReflectionException
      */
     public function testGetLetterFromNumber(int $n, string $expected)
     {
@@ -238,11 +238,11 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::translateProductToLetters()
+     * @covers       \App\Http\Controllers\MatrixController::translateProductToLetters()
      * @dataProvider providerProductMatrix
-     * @param array $numProduct
-     * @param array $expected
-     * @throws ReflectionException
+     * @param        array $numProduct
+     * @param        array $expected
+     * @throws       ReflectionException
      */
     public function testTranslateProductToLetters(array $numProduct, array $expected)
     {
@@ -267,11 +267,11 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @covers       \App\Http\Controllers\MatrixController::multiply()
      * @dataProvider providerMultiply
-     * @param string $willReturn
-     * @param array $expected
-     * @throws Exception
+     * @param        string $willReturn
+     * @param        array  $expected
+     * @throws       Exception
      */
     public function testMultiplyMethod(string $willReturn, array $expected)
     {
@@ -318,11 +318,11 @@ class MatrixTest extends TestCase
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @covers       \App\Http\Controllers\MatrixController::multiply()
      * @dataProvider providerMultiply
-     * @param string $json
-     * @param array $expected
-     * @throws Exception
+     * @param        string $json
+     * @param        array $expected
+     * @throws       Exception
      */
     /*public function testCallToMultiply(string $json, array $expected)
     {
