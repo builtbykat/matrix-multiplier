@@ -13,4 +13,15 @@ abstract class TestCase extends BaseTestCase
     {
         return require __DIR__.'/../bootstrap/app.php';
     }
+
+    /**
+     * @param string $className
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getMock(string $className)
+    {
+        return $this->getMockBuilder($className)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
 }

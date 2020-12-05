@@ -1,10 +1,27 @@
 <?php
 
+use App\Http\Controllers\MatrixController;
+
 /**
  * @uses \App\Http\Controllers\MatrixController
  */
 class MatrixTest extends TestCase
 {
+    /**
+     * @var MatrixController|object
+     */
+    protected object $mc;
+    /**
+     * @var string
+     */
+    protected string $mcName;
+
+    protected function setUp() : void
+    {
+        $this->mc = new App\Http\Controllers\MatrixController();
+        $this->mcName = App\Http\Controllers\MatrixController::class;
+    }
+
     public function providerContent()
     {
         return [
@@ -28,13 +45,13 @@ class MatrixTest extends TestCase
      * @dataProvider providerContent
      * @param string $content
      * @param bool $expected
+     * @throws ReflectionException
      */
     public function testValidateContent(string $content, bool $expected)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $validateContent = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateContent');
+        $validateContent = new ReflectionMethod($this->mcName, 'validateContent');
         $validateContent->setAccessible(true);
-        $this->assertEquals($expected, $validateContent->invoke($c, $content));
+        $this->assertEquals($expected, $validateContent->invoke($this->mc, $content));
     }
 
     public function providerMatrices()
@@ -84,13 +101,13 @@ class MatrixTest extends TestCase
      * @param array $m1
      * @param array $m2
      * @param bool $expected
+     * @throws ReflectionException
      */
     public function testValidateMatrices(array $m1, array $m2, bool $expected)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $validateMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateMatrices');
+        $validateMatrices = new ReflectionMethod($this->mcName, 'validateMatrices');
         $validateMatrices->setAccessible(true);
-        $this->assertEquals($expected, $validateMatrices->invoke($c, $m1, $m2));
+        $this->assertEquals($expected, $validateMatrices->invoke($this->mc, $m1, $m2));
     }
 
     public function providerGoodMatrices()
@@ -144,13 +161,13 @@ class MatrixTest extends TestCase
      * @param array $m1
      * @param array $m2
      * @param array $expected product size
+     * @throws ReflectionException
      */
     public function testCreateProductPlaceholder(array $m1, array $m2, array $expected)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $productPlaceholder = new ReflectionMethod('App\Http\Controllers\MatrixController', 'createProductPlaceholder');
+        $productPlaceholder = new ReflectionMethod($this->mcName, 'createProductPlaceholder');
         $productPlaceholder->setAccessible(true);
-        $this->assertSameSize($expected, $productPlaceholder->invoke($c, $m1, $m2));
+        $this->assertSameSize($expected, $productPlaceholder->invoke($this->mc, $m1, $m2));
     }
 
     /**
@@ -160,13 +177,13 @@ class MatrixTest extends TestCase
      * @param array $m2
      * @param array $expected product matrix
      * @param array $stub product matrix set to zeros
+     * @throws ReflectionException
      */
     public function testMultiplyMatrices(array $m1, array $m2, array $expected, array $stub)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $multiplyMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'multiplyMatrices');
+        $multiplyMatrices = new ReflectionMethod($this->mcName, 'multiplyMatrices');
         $multiplyMatrices->setAccessible(true);
-        $this->assertEquals($expected, $multiplyMatrices->invoke($c, $m1, $m2, $stub));
+        $this->assertEquals($expected, $multiplyMatrices->invoke($this->mc, $m1, $m2, $stub));
     }
 
     public function providerNumber()
@@ -185,13 +202,13 @@ class MatrixTest extends TestCase
      * @dataProvider providerNumber
      * @param int $n
      * @param string $expected
+     * @throws ReflectionException
      */
     public function testGetLetterFromNumber(int $n, string $expected)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $getLetterFromNumber = new ReflectionMethod('App\Http\Controllers\MatrixController', 'getLetterFromNumber');
+        $getLetterFromNumber = new ReflectionMethod($this->mcName, 'getLetterFromNumber');
         $getLetterFromNumber->setAccessible(true);
-        $this->assertEquals($expected, $getLetterFromNumber->invoke($c, $n));
+        $this->assertEquals($expected, $getLetterFromNumber->invoke($this->mc, $n));
     }
 
     public function providerProductMatrix()
@@ -225,13 +242,13 @@ class MatrixTest extends TestCase
      * @dataProvider providerProductMatrix
      * @param array $numProduct
      * @param array $expected
+     * @throws ReflectionException
      */
     public function testTranslateProductToLetters(array $numProduct, array $expected)
     {
-        $c = new App\Http\Controllers\MatrixController();
-        $translateProductToLetters = new ReflectionMethod('App\Http\Controllers\MatrixController', 'translateProductToLetters');
+        $translateProductToLetters = new ReflectionMethod($this->mcName, 'translateProductToLetters');
         $translateProductToLetters->setAccessible(true);
-        $this->assertEquals($expected, $translateProductToLetters->invoke($c, $numProduct));
+        $this->assertEquals($expected, $translateProductToLetters->invoke($this->mc, $numProduct));
     }
 
     public function providerMultiply()
@@ -256,18 +273,14 @@ class MatrixTest extends TestCase
      * @param array $expected
      * @throws Exception
      */
-    public function testMultiplyMethod($willReturn, $expected)
+    public function testMultiplyMethod(string $willReturn, array $expected)
     {
-        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->getMock(\Illuminate\Http\Request::class);
         $request->expects($this->once())
             ->method('getContent')
             ->willReturn($willReturn);
 
-        $c = new \App\Http\Controllers\MatrixController();
-
-        $actual = $c->multiply($request);
+        $actual = $this->mc->multiply($request);
 
         $this->assertEquals(json_encode($expected), $actual->getContent());
     }
@@ -280,15 +293,12 @@ class MatrixTest extends TestCase
     {
         $this->expectException(Exception::class);
 
-        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->getMock(\Illuminate\Http\Request::class);
         $request->expects($this->once())
             ->method('getContent')
             ->willReturn('{"matrices":"[[[A,2,3],[4,5,6]],[[7,8],[9,10],[11,Z]]"}');
 
-        $c = new \App\Http\Controllers\MatrixController();
-        $c->multiply($request);
+        $this->mc->multiply($request);
     }
 
     /**
@@ -299,15 +309,12 @@ class MatrixTest extends TestCase
     {
         $this->expectException(Exception::class);
 
-        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->getMock(\Illuminate\Http\Request::class);
         $request->expects($this->once())
             ->method('getContent')
             ->willReturn('{"matrices":"[[[1,2,3],[4,5,6]],[[7,8],[9,10]]]"}');
 
-        $c = new \App\Http\Controllers\MatrixController();
-        $c->multiply($request);
+        $this->mc->multiply($request);
     }
 
     /**
@@ -317,10 +324,10 @@ class MatrixTest extends TestCase
      * @param array $expected
      * @throws Exception
      */
-    public function testCallToMultiply($json, $expected)
+    /*public function testCallToMultiply(string $json, array $expected)
     {
         $this->call('POST', '/api/try', [], [], [], [], $json);
 
         $this->assertEquals(json_encode($expected), $this->response->getContent());
-    }
+    }*/
 }
