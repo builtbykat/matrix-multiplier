@@ -9,7 +9,7 @@ class MatrixController extends Controller
 {
     /**
      * @param Request $request
-     * @return array|void
+     * @return object
      * @throws Exception
      */
     public function multiply(Request $request) {
@@ -18,12 +18,13 @@ class MatrixController extends Controller
 
         $m1 = $matrices[0];
         $m2 = $matrices[1];
-        if ($productPlaceholder = $this->validateMatrices($m1, $m2)) {
-            $numProducts = $this->multiplyMatrices($m1, $m2, $productPlaceholder);
-            return $this->translateProductToLetters($numProducts);
-        }
 
-        return;
+        $productPlaceholder = $this->validateMatrices($m1, $m2);
+
+        $numProducts = $this->multiplyMatrices($m1, $m2, $productPlaceholder);
+
+        return response()
+            ->json(["product" => $this->translateProductToLetters($numProducts)]);
     }
 
     /**
@@ -33,8 +34,8 @@ class MatrixController extends Controller
      * @throws Exception
      */
     private function validateMatrices(array $m1, array $m2) {
-        if (count($m1[0]) !== count($m2)) { // col count, row count // || count($m1) !== count($m2[0])
-            throw new Exception("Matrix cannot be multiplied.  Matrix is not the same size.");
+        if (count($m1[0]) !== count($m2)) { // col count, row count
+            throw new Exception('Matrix cannot be multiplied.  Matrix is not the same size.', 422);
         }
         // set up matrix to populate later, helps prevent undefined index issues
         $productSize = count($m1) * count($m2[0]);

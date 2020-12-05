@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @uses \App\Http\Controllers\MatrixController
+ */
 class MatrixTest extends TestCase
 {
     public function providerBadMatrices()
@@ -185,67 +188,74 @@ class MatrixTest extends TestCase
         $this->assertEquals($expected, $translateProductToLetters->invoke($c, $numProduct));
     }
 
+    public function providerMultiply()
+    {
+        return [
+            [
+                '{"matrices":"[[[1,2,3],[4,5,6]],[[7,8],[9,10],[11,12]]]"}',
+                [
+                    "product" => [
+                        ["BF","BL"],
+                        ["EI","EX"],
+                    ]
+                ]
+            ]
+        ];
+    }
+
     /**
      * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @dataProvider providerMultiply
+     * @param string $willReturn
+     * @param array $expected
+     * @throws Exception
      */
-    /*public function testMultiplyMethod()
+    public function testMultiplyMethod($willReturn, $expected)
     {
         $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $request->expects($this->any())
-            ->method('json')
-            ->method('get')
-            ->willReturn([[[1,2,3],[4,5,6]],[[7,8],[9,10],[11,12]]]);
+        $request->expects($this->once())
+            ->method('getContent')
+            ->willReturn($willReturn);
 
         $c = new \App\Http\Controllers\MatrixController();
 
-        $expected = [
-            ["BF","BL"],
-            ["EI","EX"],
-        ];
+        $actual = $c->multiply($request);
 
-        $this->assertEquals($expected, $c->multiply($request));
-    }*/
-
-    /*public function testMultiplyUnvalidated()
-    {
-        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->any())
-            ->method('json')
-            ->method('get')
-            ->willReturn([[[1,2,3],[4,5,6]],[[7,8],[9,10]]]);
-
-        $mc = $this->getMockBuilder(\App\Http\Controllers\MatrixController::class)
-            ->getMock();
-        $mc->method($this->once())
-            ->method('validateMatrices')
-            ->willThrowException(Exception::class);
-
-        $c = new \App\Http\Controllers\MatrixController();
-
-        $expected = [];
-
-        $this->assertEquals($expected, $c->multiply($request));
-    }*/
+        $this->assertEquals(json_encode($expected), $actual->getContent());
+    }
 
     /**
-     * @covers API req to /api/try
+     * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @throws Exception
      */
-    public function testCallToMultiply()
+    public function testMultiplyUnvalidated()
     {
-        $json = '{"matrices":"[[[1,2,3],[4,5,6]],[[7,8],[9,10],[11,12]]]"}';
+        $this->expectException(Exception::class);
 
+        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"matrices":"[[[1,2,3],[4,5,6]],[[7,8],[9,10]]]"}');
+
+        $c = new \App\Http\Controllers\MatrixController();
+        $c->multiply($request);
+    }
+
+    /**
+     * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @dataProvider providerMultiply
+     * @param string $json
+     * @param array $expected
+     * @throws Exception
+     */
+    public function testCallToMultiply($json, $expected)
+    {
         $this->call('POST', '/api/try', [], [], [], [], $json);
 
-        $expected = [
-            ["BF","BL"],
-            ["EI","EX"],
-        ];
-
-        $this->assertEquals($expected, json_decode($this->response->getContent()));
+        $this->assertEquals(json_encode($expected), $this->response->getContent());
     }
 }
