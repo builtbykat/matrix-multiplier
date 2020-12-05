@@ -56,5 +56,5 @@ class Handler extends ExceptionHandler
                 'code' => $exception->getCode(),
                 'message' => $exception->getMessage(),
             ]
-        ], $rendered->getStatusCode());    }
+        ], $exception->getCode());    }
 }

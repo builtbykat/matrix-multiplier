@@ -14,12 +14,16 @@ class MatrixController extends Controller
      */
     public function multiply(Request $request) {
         $content = json_decode($request->getContent(), true);
-        $matrices = json_decode($content['matrices']);
+        if (!$this->validateContent($content['matrices']))
+            throw new Exception('Matrices must only contain integers.', 422);
 
+        $matrices = json_decode($content['matrices']);
         $m1 = $matrices[0];
         $m2 = $matrices[1];
+        if (!$this->validateMatrices($m1, $m2))
+            throw new Exception('Matrix cannot be multiplied.  Matrix is not the same size.', 422);
 
-        $productPlaceholder = $this->validateMatrices($m1, $m2);
+        $productPlaceholder = $this->createProductPlaceholder($m1, $m2);
 
         $numProducts = $this->multiplyMatrices($m1, $m2, $productPlaceholder);
 
@@ -28,16 +32,35 @@ class MatrixController extends Controller
     }
 
     /**
+     * @param string $content
+     * @return bool
+     * @throws Exception
+     */
+    public function validateContent(string $content) {
+        if (preg_match('/[a-z=!#&*|<>]/i', $content))
+            return false;
+        return true;
+    }
+
+    /**
      * @param array $m1
      * @param array $m2
-     * @return array $productPlaceholder
+     * @return bool
      * @throws Exception
      */
     private function validateMatrices(array $m1, array $m2) {
-        if (count($m1[0]) !== count($m2)) { // col count, row count
-            throw new Exception('Matrix cannot be multiplied.  Matrix is not the same size.', 422);
-        }
-        // set up matrix to populate later, helps prevent undefined index issues
+        if (count($m1[0]) !== count($m2))
+            return false;
+        return true;
+    }
+
+    /**
+     * Set up matrix to populate later, helps prevent undefined index issues
+     * @param array $m1
+     * @param array $m2
+     * @return array
+     */
+    private function createProductPlaceholder(array $m1, array $m2) {
         $productSize = count($m1) * count($m2[0]);
         $productPlaceholder = [];
         for ($i = 0; $i < $productSize/2; $i++) {

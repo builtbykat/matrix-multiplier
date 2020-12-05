@@ -5,7 +5,39 @@
  */
 class MatrixTest extends TestCase
 {
-    public function providerBadMatrices()
+    public function providerContent()
+    {
+        return [
+            [
+                '[[[0=1,2,3],[4,5,6]],[[7,8],[9,10],[11,12]]]',
+                false,
+            ],
+            [
+                '[[[A,B,C],[4,5,6]],[[7,8],[9,10],[11,12]]]',
+                false,
+            ],
+            [
+                '[[[1,2,3],[4,5,6]],[[7,8],[9,10],[11,12]]]',
+                true,
+            ],
+        ];
+    }
+
+    /**
+     * @covers \App\Http\Controllers\MatrixController::validateContent
+     * @dataProvider providerContent
+     * @param string $content
+     * @param bool $expected
+     */
+    public function testValidateContent(string $content, bool $expected)
+    {
+        $c = new App\Http\Controllers\MatrixController();
+        $validateContent = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateContent');
+        $validateContent->setAccessible(true);
+        $this->assertEquals($expected, $validateContent->invoke($c, $content));
+    }
+
+    public function providerMatrices()
     {
         return [
             [//0
@@ -16,7 +48,8 @@ class MatrixTest extends TestCase
                 [ //m2
                     [1,2],
                     [3,4],
-                ]
+                ],
+                false,
             ],
             [//1
                 [ //m1
@@ -27,24 +60,37 @@ class MatrixTest extends TestCase
                     [1,2],
                     [3,4],
                     [5,6],
-                ]
+                ],
+                false,
+            ],
+            [
+                [ //m1
+                    [1,2,3],
+                    [4,5,6],
+                ],
+                [ //m2
+                    [1,2],
+                    [3,4],
+                    [5,6],
+                ],
+                true,
             ],
         ];
     }
 
     /**
      * @covers \App\Http\Controllers\MatrixController::validateMatrices()
-     * @dataProvider providerBadMatrices
+     * @dataProvider providerMatrices
      * @param array $m1
      * @param array $m2
+     * @param bool $expected
      */
-    public function testWhenMatrixColRowInequal(array $m1, array $m2)
+    public function testValidateMatrices(array $m1, array $m2, bool $expected)
     {
-        $this->expectException(Exception::class);
         $c = new App\Http\Controllers\MatrixController();
         $validateMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateMatrices');
         $validateMatrices->setAccessible(true);
-        $validateMatrices->invoke($c, $m1, $m2);
+        $this->assertEquals($expected, $validateMatrices->invoke($c, $m1, $m2));
     }
 
     public function providerGoodMatrices()
@@ -67,7 +113,7 @@ class MatrixTest extends TestCase
                 [
                     [0,0],
                     [0,0],
-                ]
+                ],
             ],
             [//1
                 [ //m1
@@ -87,24 +133,24 @@ class MatrixTest extends TestCase
                 [
                     [0,0],
                     [0,0],
-                ]
+                ],
             ],
         ];
     }
 
     /**
-     * @covers \App\Http\Controllers\MatrixController::validateMatrices()
+     * @covers \App\Http\Controllers\MatrixController::createProductPlaceholder()
      * @dataProvider providerGoodMatrices
      * @param array $m1
      * @param array $m2
      * @param array $expected product size
      */
-    public function testWhenMatrixColRowEqual(array $m1, array $m2, array $expected)
+    public function testCreateProductPlaceholder(array $m1, array $m2, array $expected)
     {
         $c = new App\Http\Controllers\MatrixController();
-        $validateMatrices = new ReflectionMethod('App\Http\Controllers\MatrixController', 'validateMatrices');
-        $validateMatrices->setAccessible(true);
-        $this->assertSameSize($expected, $validateMatrices->invoke($c, $m1, $m2));
+        $productPlaceholder = new ReflectionMethod('App\Http\Controllers\MatrixController', 'createProductPlaceholder');
+        $productPlaceholder->setAccessible(true);
+        $this->assertSameSize($expected, $productPlaceholder->invoke($c, $m1, $m2));
     }
 
     /**
@@ -159,7 +205,7 @@ class MatrixTest extends TestCase
                 [
                     ['A','B'],
                     ['Z','AA'],
-                ]
+                ],
             ],
             [
                 [
@@ -169,8 +215,8 @@ class MatrixTest extends TestCase
                 [
                     ['K','S'],
                     ['AB','UMX'],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -198,7 +244,7 @@ class MatrixTest extends TestCase
                         ["BF","BL"],
                         ["EI","EX"],
                     ]
-                ]
+                ],
             ]
         ];
     }
@@ -230,7 +276,26 @@ class MatrixTest extends TestCase
      * @covers \App\Http\Controllers\MatrixController::multiply()
      * @throws Exception
      */
-    public function testMultiplyUnvalidated()
+    public function testMultiplyUnvalidatedContent()
+    {
+        $this->expectException(Exception::class);
+
+        $request = $this->getMockBuilder(\Illuminate\Http\Request::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"matrices":"[[[A,2,3],[4,5,6]],[[7,8],[9,10],[11,Z]]"}');
+
+        $c = new \App\Http\Controllers\MatrixController();
+        $c->multiply($request);
+    }
+
+    /**
+     * @covers \App\Http\Controllers\MatrixController::multiply()
+     * @throws Exception
+     */
+    public function testMultiplyUnvalidatedMatrix()
     {
         $this->expectException(Exception::class);
 
