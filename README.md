@@ -3,9 +3,9 @@ A nanoservice built with Lumen
 
 ## Quick Start
 - `git clone . . .`
-- add line to etc/hosts, serve it up - I used Homestead :)
+- add hostname, add line to etc/hosts, serve it up - I used Homestead :)
 - `composer install`
-- test api call (however you wish!)
+- make `POST` call to `http://{your-assigned-hostname}/api/try`
     
     _Example provided with bash script:_ `apitest.sh`
     ```
@@ -24,3 +24,6 @@ A nanoservice built with Lumen
     $ ./apitest.sh
     {"product":[["BF","BL"],["EI","EX"]]}
     ```
+
+##### Notes
+There is a lot of room for human error building out the `matrices` request body, maybe each matrix is better passed as `{"matrix1":"[...]", "matrix2":"[...]"}`
