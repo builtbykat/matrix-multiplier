@@ -78,10 +78,9 @@ class MatrixController extends Controller
      */
     private function createProductPlaceholder(array $m1, array $m2)
     {
-        $productSize = count($m1) * count($m2[0]);
         $productPlaceholder = [];
-        for ($i = 0; $i < $productSize / 2; $i++) {
-            for ($j = 0; $j < $productSize / 2; $j++) {
+        for ($i = 0; $i < count($m1); $i++) {
+            for ($j = 0; $j < count($m2[0]); $j++) {
                 $productPlaceholder[$i][$j] = 0;
             }
         }
@@ -134,7 +133,8 @@ class MatrixController extends Controller
     {
         for ($i = 0; $i < count($product); $i++) {
             for ($j = 0; $j < count($product); $j++) {
-                $product[$i][$j] = $this->getLetterFromNumber($product[$i][$j]);
+                if (isset($product[$i][$j]))
+                    $product[$i][$j] = $this->getLetterFromNumber($product[$i][$j]);
             }
         }
         return $product;
